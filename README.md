@@ -3,18 +3,25 @@ Fiskalizacija
 [![Build Status](https://travis-ci.org/nticaric/fiskalizacija.svg?branch=master)](https://travis-ci.org/nticaric/fiskalizacija)
 [![Total Downloads](https://img.shields.io/packagist/dt/nticaric/fiskalizacija.svg)](https://packagist.org/packages/nticaric/fiskalizacija)
 
-PHP API za fiskalizaciju računa
+PHP API za fiskalizaciju računa u Hrvatskoj
 
-###Primjer računa:
+### Primjer računa:
 
-Ukoliko se radi o testnoj okolini sa demo certifikatom, treci parametar konustruktora je 
+Ako se radi o testnoj okolini s demo certifikatom, četvrti parametar konstruktora je
 potrebno postaviti u `true`
 
-	$fis = new Fiskalizacija("./path/to/certificate.pfx", "password", true);
+	$fis = new Fiskalizacija("./path/to/certificate.pfx", "password", "security" , true);
 
-Ukoliko se radi o produkcijkoj okolini, treci parametar se moze izostaviti
+Ako se radi o produkcijskoj okolini, četvrti parametar se treba postaviti na `false` 
+ili se može izostaviti
 
 	$fis = new Fiskalizacija("./path/to/certificate.pfx", "password");
+
+Od 27. listopada 2015. napušta se SSL protokol pri komunikaciji fiskalnih blagajni s poslužiteljima i prelazi se na TLS protokol.
+Kao treći parametar konstruktora treba se postaviti `TLS` umjesto `SSL`. Ako bi se treći parametar izostavio, koristio bi se `SSL` kao default protokol.
+
+    $fis = new Fiskalizacija("./path/to/certificate.pfx", "password", "TLS", true);
+
 
 ```php
 
@@ -60,7 +67,7 @@ $bill->setTotalValue(456.1);
 $bill->setTypeOfPlacanje("G");
 $bill->setOibOperative("34562123431");
 
-$fis = new Fiskalizacija("path/to/demo.pfx", "password", true);
+$fis = new Fiskalizacija("path/to/demo.pfx", "password", "TLS", true);
 
 $bill->setSecurityCode(
     $bill->securityCode(
@@ -83,7 +90,7 @@ $res = $fis->sendSoap($soapMessage);
 var_dump($res);
 ```
 
-###Primjer poslovnog prostora:
+### Primjer poslovnog prostora:
 
 ```php
 
@@ -120,7 +127,7 @@ $businessArea->setSpecificPurpose("spec namjena");
 $businessArea->setWorkingTime("Pon:08-11h Uto:15-17");
 $businessAreaRequest = new BusinessAreaRequest($businessArea);
 
-$fis = new Fiskalizacija("./path/to/demo.pfx", "password", true);
+$fis = new Fiskalizacija("./path/to/demo.pfx", "password", "TLS", true);
 
 $soapMessage = $fis->signXML($businessAreaRequest->toXML());
 
@@ -128,7 +135,7 @@ $res = $fis->sendSoap($soapMessage);
 var_dump($res);
 ```
 
-###Primjer testne poruke:
+### Primjer testne poruke:
 
 ```php
 
@@ -144,7 +151,7 @@ $test->setMessage("testna poruka");
 
 $testRequest = new TestRequest($test);
 
-$fis = new Fiskalizacija("./path/to/demo.pfx", "password", true);
+$fis = new Fiskalizacija("./path/to/demo.pfx", "password", "TLS", true);
 
 $soapMessage = $fis->plainXML($testRequest->toXML());
 
