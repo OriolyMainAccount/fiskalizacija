@@ -95,6 +95,10 @@ class Fiskalizacija
 		$X509Issuer = $this->publicCertificateData['issuer'];
 		$X509IssuerName = sprintf('OU=%s,O=%s,C=%s', $X509Issuer['OU'] ?? '', $X509Issuer['O'] ?? '', $X509Issuer['C'] ?? '');
 		$X509IssuerSerial = $this->publicCertificateData['serialNumber'];
+        
+        if (strpos($X509IssuerSerial, '0x') === 0) {
+            $X509IssuerSerial = self::bchexdec($X509IssuerSerial);
+        }
 
         $publicCertificatePureString = str_replace('-----BEGIN CERTIFICATE-----', '', $this->certificate['cert']);
         $publicCertificatePureString = str_replace('-----END CERTIFICATE-----', '', $publicCertificatePureString);
@@ -223,4 +227,15 @@ class Fiskalizacija
 
     }
 
+    public static function bchexdec($hex)
+    {
+        $dec = 0;
+        $len = strlen($hex);
+        
+        for ($i = 1; $i <= $len; $i++) {
+            $dec = \bcadd($dec, \bcmul((string)hexdec($hex[$i - 1]), \bcpow('16', (string)($len - $i))));
+        }
+        
+        return $dec;
+    }
 }
